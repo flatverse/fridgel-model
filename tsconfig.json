@@ -1,6 +1,7 @@
 {
   "include": ["src/**/*.ts"],
   "compilerOptions": {
-    "target": "ES2017"
+    "target": "ES2017",
+    "outDir": "dist"
   }
 }
