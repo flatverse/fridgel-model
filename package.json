@@ -7,10 +7,13 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "build": "rm -rf dist && tsc"
   },
   "author": "Cody Thompson",
-  "repository": "git@github.com:flatverse/fridgel-model.git",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/flatverse/fridgel-model.git"
+  },
   "license": "UNLICENSED",
   "devDependencies": {
     "typescript": "^5.7.2"
