@@ -2,6 +2,7 @@
   "include": ["src/**/*.ts"],
   "compilerOptions": {
     "target": "ES2017",
-    "outDir": "dist"
+    "outDir": "dist",
+    "declaration": true
   }
 }
