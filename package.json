@@ -1,10 +1,8 @@
 {
   "name": "@flatverse/fridgely-model",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "main": "dist/index.js",
-  "files": [
-    "dist"
-  ],
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rm -rf dist && tsc"
@@ -12,7 +10,7 @@
   "author": "Cody Thompson",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/flatverse/fridgel-model.git"
+    "url": "git+ssh://git@github.com/flatverse/fridgely-model.git"
   },
   "license": "UNLICENSED",
   "devDependencies": {
