@@ -5,15 +5,18 @@ export const CURRENT_VERSION = 0
 export interface SerializedFridgeState {
   version: number
   references: Referencable<string>[]
+  messages:{level:"WARNING"|"ERROR", message:string, refIds?:string[]}[]
 }
 
 export class FridgeState {
   private refsById:Record<string,Referencable<string>> = {}
   private refsByType:Record<string,Referencable<string>[]> = {}
 
-  readonly messages:{level:"WARNING"|"ERROR", message:string, refIds?:string[]}[]
-
-  constructor(references: Referencable<string>[]) {
+  constructor(
+    readonly version:number,
+    references: Referencable<string>[],
+    readonly messages:{level:"WARNING"|"ERROR", message:string, refIds?:string[]}[] = []
+  ) {
     for (let ref of references) {
       const {id, type} = ref
       if (id in this.refsById) {
@@ -53,10 +56,12 @@ export class FridgeState {
 
   serialize():string {
     // TODO - store duplicate values in error messages so stuff doesn't get lost
-    return JSON.stringify({
-      fridgely_version: CURRENT_VERSION,
-      references: Object.values(this.refsById)
-    }, null, 2)
+    const serializable:SerializedFridgeState = {
+      version: CURRENT_VERSION,
+      references: Object.values(this.refsById),
+      messages: this.messages
+    }
+    return JSON.stringify(serializable, null, 2)
   }
 
   static deserialize(serialized:string):FridgeState {
@@ -65,21 +70,31 @@ export class FridgeState {
       result = JSON.parse(serialized) as SerializedFridgeState
     }
     catch (e) {
-      const state = new FridgeState([])
+      const state = new FridgeState(CURRENT_VERSION, [])
       const msg = `Error parsing FridgeState string: ${e.message}\n${e.stack}`
       console.error(`[FridgeState].deserialize] ${msg}`)
       console.error(e)
       state.pushError(msg)
       state.pushError(serialized)
+      return state
     }
-    const {version, references} = result
+    const {version, references, messages} = result
     if (version !== CURRENT_VERSION) {
-      const state = new FridgeState([])
+      const state = new FridgeState(CURRENT_VERSION, [])
       const msg = `Unuspported version number in serialized FridgeState. Supported:${CURRENT_VERSION} Found:${version}`
       console.error(`[FridgeState].deserialize] ${msg}`)
       state.pushError(msg)
       state.pushError(serialized)
+      return state
     }
-    return new FridgeState(references)
+    if (!Array.isArray(messages)) {
+      const state = new FridgeState(CURRENT_VERSION, references, [])
+      const msg = `deserialize passed string-object that is missing the messages array`
+      console.warn(`[FridgeState].deserialize] ${msg}`)
+      state.pushWarning(msg)
+      state.pushWarning(serialized)
+      return state
+    }
+    return new FridgeState(CURRENT_VERSION, references, messages)
   }
 }
